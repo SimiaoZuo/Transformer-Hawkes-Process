@@ -10,7 +10,7 @@ Source code for [Transformer Hawkes Process (ICML 2020)](https://arxiv.org/abs/2
 
 ## Instructions
 1. Put the data folder inside this repository, modify the **data** entry in **run.sh** accordingly.
-  * The datasets are available [here](https://drive.google.com/drive/folders/0BwqmV0EcoUc8UklIR1BKV25YR1U).
+   * The datasets are available [here](https://drive.google.com/drive/folders/0BwqmV0EcoUc8UklIR1BKV25YR1U).
 2. **bash run.sh** to run the code.
 
 ## Note
