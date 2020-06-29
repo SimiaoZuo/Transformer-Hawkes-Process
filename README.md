@@ -15,8 +15,8 @@ Source code for [Transformer Hawkes Process (ICML 2020)](https://arxiv.org/abs/2
 
 ### Note
 * Right now the code only supports single GPU training, but an extension to support multiple GPUs should be easy.
-* The reported event time prediction RMSE and the time stamps provided in the datasets are not of the same unit.
-* There are several factors that can be changed, besides the ones in **run.sh**:
+* The reported event time prediction RMSE and the time stamps provided in the datasets are not of the same unit, i.e., the provided time stamps can be in minutes, but the reported results are in hours.
+* There are several factors that can be changed, beside the ones in **run.sh**:
   * In **Main.py**, function **train\_epoch**, the event time prediction squared error needs to be properly scaled to stabilize training.
   * In **Utils.py**, function **log_likelihood**, users can select whether to use numerical integration or Monte Carlo integration.
   * In **transformer/Models.py**, class **Transformer**, parameter **alpha** controls the weight of the time difference factor. This parameter can be added into the computation graph, i.e., changeable during training, but the gain is marginal.
