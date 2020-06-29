@@ -31,7 +31,7 @@ def prepare_dataloader(opt):
     print('[Info] Loading test data...')
     test_data, _ = load_data(opt.data + 'test.pkl', 'test')
 
-    trainloader = get_dataloader(train_data + dev_data, opt.batch_size, shuffle=True)
+    trainloader = get_dataloader(train_data, opt.batch_size, shuffle=True)
     testloader = get_dataloader(test_data, opt.batch_size, shuffle=False)
     return trainloader, testloader, num_types
 
@@ -66,9 +66,10 @@ def train_epoch(model, training_data, optimizer, pred_loss_func, opt):
 
         # time prediction
         se = Utils.time_loss(prediction[1], event_time)
-        se /= 100  # SE is usually large, scale it to stabilize training
 
-        loss = event_loss + pred_loss + se
+        # SE is usually large, scale it to stabilize training
+        scale_time_loss = 100
+        loss = event_loss + pred_loss + se / scale_time_loss
         loss.backward()
 
         """ update parameters """
