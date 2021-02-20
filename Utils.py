@@ -6,6 +6,13 @@ import torch.nn.functional as F
 from transformer.Models import get_non_pad_mask
 
 
+def softplus(x, beta):
+    # hard thresholding at 20
+    temp = beta * x
+    temp[temp > 20] = 20
+    return 1.0 / beta * torch.log(1 + torch.exp(temp))
+
+
 def compute_event(event, non_pad_mask):
     """ Log-likelihood of events. """
 
@@ -41,7 +48,7 @@ def compute_integral_unbiased(model, data, time, non_pad_mask, type_mask):
     temp_hid = model.linear(data)[:, 1:, :]
     temp_hid = torch.sum(temp_hid * type_mask[:, 1:, :], dim=2, keepdim=True)
 
-    all_lambda = F.softplus(temp_hid + model.alpha * temp_time, threshold=10)
+    all_lambda = softplus(temp_hid + model.alpha * temp_time, model.beta)
     all_lambda = torch.sum(all_lambda, dim=2) / num_samples
 
     unbiased_integral = all_lambda * diff_time
@@ -58,7 +65,7 @@ def log_likelihood(model, data, time, types):
         type_mask[:, :, i] = (types == i + 1).bool().to(data.device)
 
     all_hid = model.linear(data)
-    all_lambda = F.softplus(all_hid, threshold=10)
+    all_lambda = softplus(all_hid, model.beta)
     type_lambda = torch.sum(all_lambda * type_mask, dim=2)
 
     # event log-likelihood

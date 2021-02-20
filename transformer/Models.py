@@ -55,7 +55,7 @@ class Encoder(nn.Module):
         self.event_emb = nn.Embedding(num_types + 1, d_model, padding_idx=Constants.PAD)
 
         self.layer_stack = nn.ModuleList([
-            EncoderLayer(d_model, d_inner, n_head, d_k, d_v, dropout=dropout)
+            EncoderLayer(d_model, d_inner, n_head, d_k, d_v, dropout=dropout, normalize_before=False)
             for _ in range(n_layers)])
 
     def temporal_enc(self, time, non_pad_mask):
@@ -139,8 +139,15 @@ class Transformer(nn.Module):
         super().__init__()
 
         self.encoder = Encoder(
-            num_types=num_types, d_model=d_model, d_inner=d_inner,
-            n_layers=n_layers, n_head=n_head, d_k=d_k, d_v=d_v, dropout=dropout)
+            num_types=num_types,
+            d_model=d_model,
+            d_inner=d_inner,
+            n_layers=n_layers,
+            n_head=n_head,
+            d_k=d_k,
+            d_v=d_v,
+            dropout=dropout,
+        )
 
         self.num_types = num_types
 
@@ -148,7 +155,10 @@ class Transformer(nn.Module):
         self.linear = nn.Linear(d_model, num_types)
 
         # parameter for the weight of time difference
-        self.alpha = -0.1
+        self.alpha = nn.Parameter(torch.tensor(-0.1))
+
+        # parameter for the softplus function
+        self.beta = nn.Parameter(torch.tensor(1.0))
 
         # OPTIONAL recurrent layer, this sometimes helps
         self.rnn = RNN_layers(d_model, d_rnn)
